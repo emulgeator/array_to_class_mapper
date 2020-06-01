@@ -1,0 +1,11 @@
+/.settings
+/.project
+/.buildpath
+/.idea
+/.env
+/auth.json
+/nbproject/*
+vendor
+composer.phar
+.DS_Store
+coverage.*
