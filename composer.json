@@ -1,0 +1,25 @@
+{
+    "name": "emulgeator/array-to-class-mapper",
+    "description": "A library what is capable of transforming a multilevel array to a class object",
+    "minimum-stability": "stable",
+    "license": "MIT",
+    "require": {
+        "php": ">=7.4",
+        "ext-json": "*"
+    },
+    "require-dev": {
+        "nesbot/carbon": "^2.35",
+        "mockery/mockery": "^1.4",
+        "phpunit/phpunit": "^9.1"
+    },
+    "autoload": {
+      "psr-4": {
+        "Emul\\ArrayToClassMapper\\": "src"
+      }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Emul\\ArrayToClassMapper\\Test\\": "test"
+        }
+    }
+}
