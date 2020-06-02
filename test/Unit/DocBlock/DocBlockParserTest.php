@@ -73,6 +73,20 @@ class DocBlockParserTest extends TestCaseAbstract
         $this->assertSame($expectedType, $type->getName());
     }
 
+    public function testGetTypeWhenTypedArray_shouldParseProperly()
+    {
+        $parser = new DocBlockParser();
+
+        $type = $parser->getType('
+            /** @var int[] */
+        ');
+
+        $this->assertSame(true, $type->isBuiltIn());
+        $this->assertSame(false, $type->isSingle());
+        $this->assertSame(false, $type->isNullable());
+        $this->assertSame('int', $type->getName());
+    }
+
     public function testGetTypeWhenMultiLine_shouldParseProperly()
     {
         $parser = new DocBlockParser();

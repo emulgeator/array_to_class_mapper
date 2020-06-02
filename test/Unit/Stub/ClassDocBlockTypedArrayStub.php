@@ -3,13 +3,13 @@ declare(strict_types=1);
 
 namespace Emul\ArrayToClassMapper\Test\Unit\Stub;
 
-class CustomDocBlockTypeArrayStub
+class ClassDocBlockTypedArrayStub
 {
     /** @var \Emul\ArrayToClassMapper\Test\Unit\Stub\ScalarTypedStub[] */
-    private array $customArray;
+    private array $objectArray;
 
-    public function getCustomArray(): array
+    public function getObjectArray(): array
     {
-        return $this->customArray;
+        return $this->objectArray;
     }
 }
