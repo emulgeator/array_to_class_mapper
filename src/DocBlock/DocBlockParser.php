@@ -3,11 +3,11 @@ declare(strict_types=1);
 
 namespace Emul\ArrayToClassMapper\DocBlock;
 
-use Emul\ArrayToClassMapper\DocBlock\Entity\DocblockType;
+use Emul\ArrayToClassMapper\DocBlock\Entity\DocBlockType;
 
 class DocBlockParser
 {
-    public function getType(string $docblock): ?DocblockType
+    public function getType(string $docblock): ?DocBlockType
     {
         $matches = [];
         preg_match('#@var\s*([^\s]*)#i', $docblock, $matches);
@@ -34,7 +34,7 @@ class DocBlockParser
         $chosenType = reset($types);
         $isBuiltIn = $this->isBuiltInType($chosenType);
 
-        return new DocblockType($chosenType, $isSingle, $isBuiltIn, $isNullable);
+        return new DocBlockType($chosenType, $isSingle, $isBuiltIn, $isNullable);
     }
 
     private function isBuiltInType(string $type): bool

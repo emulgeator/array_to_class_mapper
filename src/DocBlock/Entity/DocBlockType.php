@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Emul\ArrayToClassMapper\DocBlock\Entity;
 
-class DocblockType
+class DocBlockType
 {
     private string $name;
 

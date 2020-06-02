@@ -5,7 +5,7 @@ namespace Emul\ArrayToClassMapper;
 
 use Closure;
 use Emul\ArrayToClassMapper\DocBlock\DocBlockParser;
-use Emul\ArrayToClassMapper\DocBlock\Entity\DocblockType;
+use Emul\ArrayToClassMapper\DocBlock\Entity\DocBlockType;
 use ReflectionClass;
 
 class Mapper
@@ -90,7 +90,7 @@ class Mapper
         return $object;
     }
 
-    private function castArray(array $array, DocblockType $docblockType): array
+    private function castArray(array $array, DocBlockType $docblockType): array
     {
         $castedArray = [];
         if ($docblockType->isBuiltIn()) {

@@ -6,7 +6,7 @@ namespace Emul\ArrayToClassMapper\Test\Unit;
 use Carbon\Carbon;
 use Emul\ArrayToClassMapper\Mapper;
 use Emul\ArrayToClassMapper\DocBlock\DocBlockParser;
-use Emul\ArrayToClassMapper\DocBlock\Entity\DocblockType;
+use Emul\ArrayToClassMapper\DocBlock\Entity\DocBlockType;
 use Emul\ArrayToClassMapper\Test\Unit\Stub\CustomDocBlockTypeArrayStub;
 use Emul\ArrayToClassMapper\Test\Unit\Stub\CustomDocBlockTypedStub;
 use Emul\ArrayToClassMapper\Test\Unit\Stub\CustomTypedStub;
@@ -61,7 +61,7 @@ class MapperTest extends TestCaseAbstract
     {
         $mapper = $this->getMapper();
 
-        $this->expectTypeRetrievedFromDocBlock('/** @var int[] */', new DocblockType('int', false, true, false));
+        $this->expectTypeRetrievedFromDocBlock('/** @var int[] */', new DocBlockType('int', false, true, false));
 
         $input = [
             'scalarTypedArray' => ['1', '2'],
@@ -80,7 +80,7 @@ class MapperTest extends TestCaseAbstract
         $this->expectTypeRetrievedFromDocBlock('', null);
         $this->expectTypeRetrievedFromDocBlock(
             '/** @var \Emul\ArrayToClassMapper\Test\Unit\Stub\ScalarTypedStub[] */',
-            new DocblockType('\Emul\ArrayToClassMapper\Test\Unit\Stub\ScalarTypedStub', false, false, false)
+            new DocBlockType('\Emul\ArrayToClassMapper\Test\Unit\Stub\ScalarTypedStub', false, false, false)
         );
 
         $input = [
@@ -137,7 +137,7 @@ class MapperTest extends TestCaseAbstract
     {
         $mapper = $this->getMapper();
 
-        $this->expectTypeRetrievedFromDocBlock('/** @var int|null */', new DocblockType('int', true, true, true));
+        $this->expectTypeRetrievedFromDocBlock('/** @var int|null */', new DocBlockType('int', true, true, true));
 
         $input = ['int' => '1'];
 
@@ -151,7 +151,7 @@ class MapperTest extends TestCaseAbstract
     {
         $currentTime = '2020-01-01 01:01:01';
 
-        $this->expectTypeRetrievedFromDocBlock('/** @var \Carbon\Carbon */', new DocblockType('\Carbon\Carbon', true, false, false));
+        $this->expectTypeRetrievedFromDocBlock('/** @var \Carbon\Carbon */', new DocBlockType('\Carbon\Carbon', true, false, false));
 
         $input = ['currentTime' => $currentTime];
         $customMapper = \Closure::fromCallable(function (string $timeString) {
@@ -167,7 +167,7 @@ class MapperTest extends TestCaseAbstract
         $this->assertSame($currentTime, $result->getCurrentTime()->toDateTimeString());
     }
 
-    private function expectTypeRetrievedFromDocBlock(string $docBlock, ?DocblockType $expectedResult)
+    private function expectTypeRetrievedFromDocBlock(string $docBlock, ?DocBlockType $expectedResult)
     {
         $this->docBlockParser->shouldReceive('getType')->with($docBlock)->andReturn($expectedResult);
     }
