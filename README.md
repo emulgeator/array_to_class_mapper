@@ -170,3 +170,16 @@ The same works if the Custom type is in an array but in this case the mapper fun
 
 ```
 
+## Limitations
+The library currently is not able to import and auto load a class defined in a DocBlock.
+The following example will not work because the class is not imported neither we know the FQCN:
+```php
+/** @var Value[] */
+private array $values = [];
+```
+
+To fix this you need to use the FQCN of the class:
+```php
+/** @var \NameSpace\Value[] */
+private array $values = [];
+```
