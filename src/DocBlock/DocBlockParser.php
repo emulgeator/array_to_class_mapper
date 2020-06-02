@@ -16,9 +16,38 @@ class DocBlockParser
             return null;
         }
 
-        $isSingle = strpos($matches[1], '[]') !== false;
-        $name     = str_replace(['[', ']'], '', $matches[1]);
+        $isSingle   = strpos($matches[1], '[]') === false;
+        $types      = explode('|', str_replace(['[', ']'], '', $matches[1]));
+        $isNullable = false;
 
-        return new DocblockType($isSingle, $name);
+        foreach ($types as $index => $type) {
+            $type = trim($type);
+            if ($type === 'null') {
+                $isNullable = true;
+                unset($types[$index]);
+            }
+            else {
+                $types[$index] = $type;
+            }
+        }
+
+        $chosenType = reset($types);
+        $isBuiltIn = $this->isBuiltInType($chosenType);
+
+        return new DocblockType($chosenType, $isSingle, $isBuiltIn, $isNullable);
+    }
+
+    private function isBuiltInType(string $type): bool
+    {
+        return in_array(
+            $type,
+            [
+                'bool',
+                'int',
+                'float',
+                'string',
+                'array',
+            ]
+        );
     }
 }

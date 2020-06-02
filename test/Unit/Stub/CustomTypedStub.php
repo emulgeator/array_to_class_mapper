@@ -5,7 +5,7 @@ namespace Emul\ArrayToClassMapper\Test\Unit\Stub;
 
 use Carbon\Carbon;
 
-class CustomStub
+class CustomTypedStub
 {
     private Carbon $currentTime;
 

@@ -22,11 +22,15 @@ class Mapper
 
     public function addCustomMapper(string $type, Closure $mapper)
     {
+        $type = $this->formatCustomTypeName($type);
+
         $this->customMappers[$type] = $mapper;
     }
 
-    public function getCustomerMapper(string $type): ?Closure
+    public function getCustomMapper(string $type): ?Closure
     {
+        $type = $this->formatCustomTypeName($type);
+
         return empty($this->customMappers[$type])
             ? null
             : $this->customMappers[$type];
@@ -47,59 +51,43 @@ class Mapper
 
                 $property->setAccessible(true);
 
-                $docblockType = $this->docBlockParser->getType((string)$property->getDocComment());
+                $docBlockType = $this->docBlockParser->getType((string)$property->getDocComment());
                 $type         = $property->getType();
 
-                if (empty($type) && empty($docblockType)) {
-                    $property->setValue($object, $value);
-                }
-                elseif (empty($type) && !empty($docblockType)) {
-
-                }
-                else {
-                    switch (true) {
-                        case $type->isBuiltin() && $type->getName() !== 'array':
-                        case $type->getName() === 'array' && empty($docblockType):
+                if (!empty($type)) {
+                    if ($type->isBuiltin()) {
+                        if ($type->getName() === 'array') {
+                            if (empty($docBlockType)) {
+                                $property->setValue($object, $value);
+                            } else {
+                                $property->setValue($object, $this->castArray($value, $docBlockType));
+                            }
+                        } else {
                             $property->setValue($object, $value);
-                            break;
-
-                        case $type->getName() === 'array' && !empty($docblockType):
-                            $property->setValue($object, $this->castArray($value, $docblockType));
-                            break;
-
-                        case !$type->isBuiltin():
-                            $property->setValue($object, $this->castCustom($value, $type->getName()));
-                            break;
-
-                        default:
-                            throw new \Exception('Unhandled case');
+                        }
+                    } else {
+                        $property->setValue($object, $this->castCustom($value, $type->getName()));
+                    }
+                } else {
+                    if (empty($docBlockType)) {
+                        $property->setValue($object, $value);
+                    } else {
+                        if ($docBlockType->isBuiltIn()) {
+                            if ($docBlockType->getName() === 'array') {
+                                $property->setValue($object, $this->castArray($value, $docBlockType));
+                            } else {
+                                settype($value, $docBlockType->getName());
+                                $property->setValue($object, $value);
+                            }
+                        } else {
+                            $property->setValue($object, $this->castCustom($value, $docBlockType->getName()));
+                        }
                     }
                 }
             }
         }
 
         return $object;
-    }
-
-    private function castByType(bool $isBuiltInType, string $typeName, ?string $docBlockTypeName)
-    {
-        switch (true) {
-            case $isBuiltInType && $typeName !== 'array':
-            case $typeName === 'array' && empty($docBlockTypeName):
-                $property->setValue($object, $value);
-                break;
-
-            case $typeName === 'array' && !empty($docBlockTypeName):
-                $property->setValue($object, $this->castArray($value, $docBlockTypeName));
-                break;
-
-            case !$isBuiltInType:
-                $property->setValue($object, $this->castCustom($value, $typeName));
-                break;
-
-            default:
-                throw new \Exception('Unhandled case');
-        }
     }
 
     private function castArray(array $array, DocblockType $docblockType): array
@@ -112,8 +100,7 @@ class Mapper
 
                 $castedArray[] = $castedItem;
             }
-        }
-        else {
+        } else {
             foreach ($array as $item) {
                 $castedArray[] = $this->map($item, $docblockType->getName());
             }
@@ -124,13 +111,17 @@ class Mapper
 
     private function castCustom($value, string $typeName)
     {
-        $customMapper = $this->getCustomerMapper($typeName);
+        $customMapper = $this->getCustomMapper($typeName);
 
         if (empty($customMapper)) {
             return $this->map($value, $typeName);
-        }
-        else {
+        } else {
             return $customMapper($value);
         }
+    }
+
+    private function formatCustomTypeName(string $type): string
+    {
+        return ltrim($type, '\\');
     }
 }

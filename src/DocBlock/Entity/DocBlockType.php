@@ -5,14 +5,20 @@ namespace Emul\ArrayToClassMapper\DocBlock\Entity;
 
 class DocblockType
 {
-    private bool $isSingle;
-
     private string $name;
 
-    public function __construct(bool $isSingle, string $name)
+    private bool $isSingle;
+
+    private bool $isBuiltIn;
+
+    private ?bool $isNullable;
+
+    public function __construct(string $name, bool $isSingle, bool $isBuiltInt, ?bool $isNullable = null)
     {
-        $this->isSingle = $isSingle;
-        $this->name     = $name;
+        $this->name       = $name;
+        $this->isSingle   = $isSingle;
+        $this->isBuiltIn  = $isBuiltInt;
+        $this->isNullable = $isNullable;
     }
 
     public function isSingle(): bool
@@ -22,20 +28,17 @@ class DocblockType
 
     public function isBuiltIn(): bool
     {
-        return in_array(
-            $this->name,
-            [
-                'boolean', 'bool',
-                'integer', 'int',
-                'double', 'float',
-                'string',
-                'array'
-            ]
-        );
+        return $this->isBuiltIn;
+    }
+
+    public function isNullable(): ?bool
+    {
+        return $this->isNullable;
     }
 
     public function getName(): string
     {
         return $this->name;
     }
+
 }
