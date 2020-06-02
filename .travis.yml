@@ -1,0 +1,6 @@
+language: php
+php:
+  - '7.4'
+before_install:
+    - composer install --dev
+script: vendor/bin/phpunit test
