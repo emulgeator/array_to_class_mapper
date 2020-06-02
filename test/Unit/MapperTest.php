@@ -7,10 +7,12 @@ use Carbon\Carbon;
 use Emul\ArrayToClassMapper\Mapper;
 use Emul\ArrayToClassMapper\DocBlock\DocBlockParser;
 use Emul\ArrayToClassMapper\DocBlock\Entity\DocBlockType;
-use Emul\ArrayToClassMapper\Test\Unit\Stub\CustomDocBlockTypeArrayStub;
+use Emul\ArrayToClassMapper\Test\Unit\Stub\ClassDocBlockTypedArrayStub;
+use Emul\ArrayToClassMapper\Test\Unit\Stub\CustomDocBlockTypedArrayStub;
 use Emul\ArrayToClassMapper\Test\Unit\Stub\CustomDocBlockTypedStub;
+use Emul\ArrayToClassMapper\Test\Unit\Stub\CustomStub;
 use Emul\ArrayToClassMapper\Test\Unit\Stub\CustomTypedStub;
-use Emul\ArrayToClassMapper\Test\Unit\Stub\ScalarDocBlockTypeArrayStub;
+use Emul\ArrayToClassMapper\Test\Unit\Stub\ScalarDocBlockTypedArrayStub;
 use Emul\ArrayToClassMapper\Test\Unit\Stub\ScalarDocBlockTypedStub;
 use Emul\ArrayToClassMapper\Test\Unit\Stub\ScalarTypedStub;
 use Emul\ArrayToClassMapper\Test\Unit\Stub\TypelessArrayStub;
@@ -67,8 +69,8 @@ class MapperTest extends TestCaseAbstract
             'scalarTypedArray' => ['1', '2'],
         ];
 
-        /** @var ScalarDocBlockTypeArrayStub $result */
-        $result = $mapper->map($input, ScalarDocBlockTypeArrayStub::class);
+        /** @var ScalarDocBlockTypedArrayStub $result */
+        $result = $mapper->map($input, ScalarDocBlockTypedArrayStub::class);
 
         $this->assertSame([1, 2], $result->getScalarTypedArray());
     }
@@ -84,15 +86,15 @@ class MapperTest extends TestCaseAbstract
         );
 
         $input = [
-            'customArray' => [
+            'objectArray' => [
                 ['int' => 1],
                 ['int' => 2],
             ],
         ];
 
-        /** @var CustomDocBlockTypeArrayStub $result */
-        $result      = $mapper->map($input, CustomDocBlockTypeArrayStub::class);
-        $mappedArray = $result->getCustomArray();
+        /** @var ClassDocBlockTypedArrayStub $result */
+        $result      = $mapper->map($input, ClassDocBlockTypedArrayStub::class);
+        $mappedArray = $result->getObjectArray();
 
         $this->assertCount(2, $mappedArray);
         $this->assertSame(1, $mappedArray[0]->getInt());
@@ -165,6 +167,39 @@ class MapperTest extends TestCaseAbstract
         $result = $mapper->map($input, CustomDocBlockTypedStub::class);
 
         $this->assertSame($currentTime, $result->getCurrentTime()->toDateTimeString());
+    }
+
+    public function testMapWhenCustomDocBlockTypedArrayPropertyGiven_shouldMapWithGivenMapper()
+    {
+        $this->expectTypeRetrievedFromDocBlock(
+            '/** @var \Emul\ArrayToClassMapper\Test\Unit\Stub\CustomStub[] */',
+            new DocBlockType('\Emul\ArrayToClassMapper\Test\Unit\Stub\CustomStub', false, false, false)
+        );
+        $this->expectTypeRetrievedFromDocBlock('', null);
+
+        $input = [
+            'objectArray' => [
+                ['key' => 'first', 'value' => '1'],
+                ['key' => 'second', 'value' => '2'],
+            ]
+        ];
+        $customMapper = \Closure::fromCallable(function (array $data) {
+            return new CustomStub('prefix_', $data['key'], $data['value']);
+        });
+
+        $mapper = $this->getMapper();
+        $mapper->addCustomMapper(CustomStub::class, $customMapper);
+
+        /** @var CustomDocBlockTypedArrayStub $result */
+        $result = $mapper->map($input, CustomDocBlockTypedArrayStub::class);
+
+        $this->assertCount(2, $result->getObjectArray());
+        $this->assertInstanceOf(CustomStub::class, $result->getObjectArray()[0]);
+        $this->assertInstanceOf(CustomStub::class, $result->getObjectArray()[1]);
+        $this->assertSame('prefix_first', $result->getObjectArray()[0]->getKey());
+        $this->assertSame('prefix_1', $result->getObjectArray()[0]->getValue());
+        $this->assertSame('prefix_second', $result->getObjectArray()[1]->getKey());
+        $this->assertSame('prefix_2', $result->getObjectArray()[1]->getValue());
     }
 
     private function expectTypeRetrievedFromDocBlock(string $docBlock, ?DocBlockType $expectedResult)

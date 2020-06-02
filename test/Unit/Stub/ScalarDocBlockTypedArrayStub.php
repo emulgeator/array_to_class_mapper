@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 namespace Emul\ArrayToClassMapper\Test\Unit\Stub;
 
-class ScalarDocBlockTypeArrayStub
+class ScalarDocBlockTypedArrayStub
 {
     /** @var int[] */
     private array $scalarTypedArray;

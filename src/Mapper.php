@@ -100,6 +100,10 @@ class Mapper
 
                 $castedArray[] = $castedItem;
             }
+        } elseif (!$docblockType->isSingle()) {
+            foreach ($array as $item) {
+                $castedArray[] = $this->castCustom($item, $docblockType->getName());
+            }
         } else {
             foreach ($array as $item) {
                 $castedArray[] = $this->map($item, $docblockType->getName());
