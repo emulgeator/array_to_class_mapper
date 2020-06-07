@@ -7,9 +7,9 @@ use Carbon\Carbon;
 
 class CustomTypedStub
 {
-    private Carbon $currentTime;
+    private ?Carbon $currentTime;
 
-    public function getCurrentTime(): Carbon
+    public function getCurrentTime(): ?Carbon
     {
         return $this->currentTime;
     }

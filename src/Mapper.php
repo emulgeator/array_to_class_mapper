@@ -66,7 +66,15 @@ class Mapper
                             $property->setValue($object, $value);
                         }
                     } else {
-                        $property->setValue($object, $this->castCustom($value, $type->getName()));
+                        if (
+                            $value === null
+                            && empty($this->getCustomMapper($type->getName()))
+                        ) {
+                            $property->setValue($object, null);
+                        }
+                        else {
+                            $property->setValue($object, $this->castCustom($value, $type->getName()));
+                        }
                     }
                 } else {
                     if (empty($docBlockType)) {

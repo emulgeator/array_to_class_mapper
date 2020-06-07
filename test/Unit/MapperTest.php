@@ -8,6 +8,7 @@ use Emul\ArrayToClassMapper\Mapper;
 use Emul\ArrayToClassMapper\DocBlock\DocBlockParser;
 use Emul\ArrayToClassMapper\DocBlock\Entity\DocBlockType;
 use Emul\ArrayToClassMapper\Test\Unit\Stub\ClassDocBlockTypedArrayStub;
+use Emul\ArrayToClassMapper\Test\Unit\Stub\ClassTypedStub;
 use Emul\ArrayToClassMapper\Test\Unit\Stub\CustomDocBlockTypedArrayStub;
 use Emul\ArrayToClassMapper\Test\Unit\Stub\CustomDocBlockTypedStub;
 use Emul\ArrayToClassMapper\Test\Unit\Stub\CustomStub;
@@ -27,6 +28,20 @@ class MapperTest extends TestCaseAbstract
         parent::setUp();
 
         $this->docBlockParser = \Mockery::mock(DocBlockParser::class);
+    }
+
+    public function testMapWhenNullGiven_shouldSet()
+    {
+        $mapper = $this->getMapper();
+
+        $this->expectTypeRetrievedFromDocBlock('', null);
+
+        $input = ['int' => null];
+
+        /** @var ScalarTypedStub $result */
+        $result = $mapper->map($input, ScalarTypedStub::class);
+
+        $this->assertNull($result->getInt());
     }
 
     public function testMapWhenBuiltInTypedPropertyGiven_shouldCast()
@@ -99,6 +114,34 @@ class MapperTest extends TestCaseAbstract
         $this->assertCount(2, $mappedArray);
         $this->assertSame(1, $mappedArray[0]->getInt());
         $this->assertSame(2, $mappedArray[1]->getInt());
+    }
+
+    public function testMapWhenClassTypedPropertyGivenWithNullValue_shouldSetToNull()
+    {
+        $mapper = $this->getMapper();
+
+        $this->expectTypeRetrievedFromDocBlock('', null);
+
+        $input = ['object' => null];
+
+        /** @var ClassTypedStub $result */
+        $result = $mapper->map($input, ClassTypedStub::class);
+
+        $this->assertNull($result->getObject());
+    }
+
+    public function testMapWhenClassTypedPropertyGiven_shouldMap()
+    {
+        $mapper = $this->getMapper();
+
+        $this->expectTypeRetrievedFromDocBlock('', null);
+
+        $input = ['object' => ['int' => 1]];
+
+        /** @var ClassTypedStub $result */
+        $result = $mapper->map($input, ClassTypedStub::class);
+
+        $this->assertSame(1, $result->getObject()->getInt());
     }
 
     public function testMapWhenArrayTypedPropertyGivenWithCustomDockBlockTypeAndCustomMapperProvided_shouldMapElementsWithGivenMapper()
