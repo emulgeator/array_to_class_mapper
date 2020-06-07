@@ -6,7 +6,7 @@ namespace Emul\ArrayToClassMapper\Test\Unit\Stub;
 class ClassDocBlockTypedArrayStub
 {
     /** @var \Emul\ArrayToClassMapper\Test\Unit\Stub\ScalarTypedStub[] */
-    private array $objectArray;
+    private $objectArray = [];
 
     public function getObjectArray(): array
     {

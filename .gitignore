@@ -5,6 +5,7 @@
 /.env
 /auth.json
 /nbproject/*
+/.phpunit.result.cache
 vendor
 composer.phar
 .DS_Store
