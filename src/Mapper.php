@@ -79,6 +79,8 @@ class Mapper
                                 settype($value, $docBlockType->getName());
                                 $property->setValue($object, $value);
                             }
+                        } elseif (!$docBlockType->isSingle()) {
+                            $property->setValue($object, $this->castArray($value, $docBlockType));
                         } else {
                             $this->setCustomValue($object, $property, $docBlockType->getName(), $value);
                         }

@@ -117,6 +117,23 @@ class MapperTest extends TestCaseAbstract
         $this->assertSame(2, $mappedArray[1]->getInt());
     }
 
+    public function testMapWhenArrayTypedPropertyGivenWithCustomDockBlockTypeWithNullValue_shouldSetToEmptyArray()
+    {
+        $mapper = $this->getMapper();
+
+        $this->expectTypeRetrievedFromDocBlock(
+            '/** @var \Emul\ArrayToClassMapper\Test\Unit\Stub\ScalarTypedStub[] */',
+            new DocBlockType('\Emul\ArrayToClassMapper\Test\Unit\Stub\ScalarTypedStub', false, false, false)
+        );
+
+        $input = [];
+
+        /** @var ClassDocBlockTypedArrayStub $result */
+        $result = $mapper->map($input, ClassDocBlockTypedArrayStub::class);
+
+        $this->assertSame([], $result->getObjectArray());
+    }
+
     public function testMapWhenClassTypedPropertyGivenWithNullValue_shouldSetToNull()
     {
         $mapper = $this->getMapper();
