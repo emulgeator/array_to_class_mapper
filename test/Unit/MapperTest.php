@@ -8,6 +8,7 @@ use Emul\ArrayToClassMapper\Mapper;
 use Emul\ArrayToClassMapper\DocBlock\DocBlockParser;
 use Emul\ArrayToClassMapper\DocBlock\Entity\DocBlockType;
 use Emul\ArrayToClassMapper\Test\Unit\Stub\ClassDocBlockTypedArrayStub;
+use Emul\ArrayToClassMapper\Test\Unit\Stub\ClassDocBlockTypedStub;
 use Emul\ArrayToClassMapper\Test\Unit\Stub\ClassTypedStub;
 use Emul\ArrayToClassMapper\Test\Unit\Stub\CustomDocBlockTypedArrayStub;
 use Emul\ArrayToClassMapper\Test\Unit\Stub\CustomDocBlockTypedStub;
@@ -126,6 +127,20 @@ class MapperTest extends TestCaseAbstract
 
         /** @var ClassTypedStub $result */
         $result = $mapper->map($input, ClassTypedStub::class);
+
+        $this->assertNull($result->getObject());
+    }
+
+    public function testMapWhenClassDocBlockTypedPropertyGivenWithNullValue_shouldSetToNull()
+    {
+        $mapper = $this->getMapper();
+
+        $this->expectTypeRetrievedFromDocBlock('/** @var ScalarTypedStub|null */', new DocBlockType('ScalarTypedStub', true, false, true));
+
+        $input = ['object' => null];
+
+        /** @var ClassDocBlockTypedStub $result */
+        $result = $mapper->map($input, ClassDocBlockTypedStub::class);
 
         $this->assertNull($result->getObject());
     }
