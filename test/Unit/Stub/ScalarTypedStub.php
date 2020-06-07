@@ -12,7 +12,7 @@ class ScalarTypedStub
         throw new \Exception('Constructor called');
     }
 
-    public function getInt(): int
+    public function getInt(): ?int
     {
         return $this->int;
     }

@@ -66,7 +66,7 @@ class Mapper
                             $property->setValue($object, $value);
                         }
                     } else {
-                        $property->setValue($object, $this->castCustom($value, $type->getName()));
+                        $this->setCustomValue($object, $property, $type->getName(), $value);
                     }
                 } else {
                     if (empty($docBlockType)) {
@@ -80,7 +80,7 @@ class Mapper
                                 $property->setValue($object, $value);
                             }
                         } else {
-                            $property->setValue($object, $this->castCustom($value, $docBlockType->getName()));
+                            $this->setCustomValue($object, $property, $docBlockType->getName(), $value);
                         }
                     }
                 }
@@ -88,6 +88,19 @@ class Mapper
         }
 
         return $object;
+    }
+
+    private function setCustomValue($object, \ReflectionProperty $property, string $typeName, $value): void
+    {
+        if (
+            $value === null
+            && empty($this->getCustomMapper($typeName))
+        ) {
+            $property->setValue($object, null);
+        }
+        else {
+            $property->setValue($object, $this->castCustom($value, $typeName));
+        }
     }
 
     private function castArray(array $array, DocBlockType $docblockType): array
