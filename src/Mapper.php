@@ -108,7 +108,9 @@ class Mapper
     private function castArray(array $array, DocBlockType $docblockType): array
     {
         $castedArray = [];
-        if ($docblockType->isBuiltIn()) {
+        if ($docblockType->getName() === 'array') {
+            $castedArray = $array;
+        } elseif ($docblockType->isBuiltIn()) {
             foreach ($array as $item) {
                 $castedItem = $item;
                 settype($castedItem, $docblockType->getName());
