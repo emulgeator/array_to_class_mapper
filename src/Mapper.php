@@ -60,7 +60,8 @@ class Mapper
                             if (empty($docBlockType)) {
                                 $property->setValue($object, $value);
                             } else {
-                                $property->setValue($object, $this->castArray($value, $docBlockType));
+                                $valueCasted = is_null($value) ? null : $this->castArray($value, $docBlockType);
+                                $property->setValue($object, $valueCasted);
                             }
                         } else {
                             $property->setValue($object, $value);

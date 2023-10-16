@@ -6,7 +6,6 @@ namespace Emul\ArrayToClassMapper\Test\Unit;
 
 use Carbon\Carbon;
 use Emul\ArrayToClassMapper\DocBlock\DocBlockParser;
-use Emul\ArrayToClassMapper\DocBlock\Entity\DocBlockType;
 use Emul\ArrayToClassMapper\Mapper;
 use Emul\ArrayToClassMapper\Test\Unit\Stub\ArrayDocBlockTypedArrayStub;
 use Emul\ArrayToClassMapper\Test\Unit\Stub\ClassDocBlockTypedArrayStub;
@@ -24,8 +23,6 @@ use Emul\ArrayToClassMapper\Test\Unit\Stub\TypelessStub;
 
 class MapperTest extends TestCaseAbstract
 {
-    private DocBlockParser $docBlockParser;
-
     protected function setUp(): void
     {
         parent::setUp();
@@ -36,10 +33,7 @@ class MapperTest extends TestCaseAbstract
     public function testMapWhenNullGiven_shouldSet()
     {
         $mapper = $this->getMapper();
-
-        $this->expectTypeRetrievedFromDocBlock('', null);
-
-        $input = ['int' => null];
+        $input  = ['int' => null];
 
         /** @var ScalarTypedStub $result */
         $result = $mapper->map($input, ScalarTypedStub::class);
@@ -50,10 +44,7 @@ class MapperTest extends TestCaseAbstract
     public function testMapWhenBuiltInTypedPropertyGiven_shouldCast()
     {
         $mapper = $this->getMapper();
-
-        $this->expectTypeRetrievedFromDocBlock('', null);
-
-        $input = ['int' => '1'];
+        $input  = ['int' => '1'];
 
         /** @var ScalarTypedStub $result */
         $result = $mapper->map($input, ScalarTypedStub::class);
@@ -64,11 +55,8 @@ class MapperTest extends TestCaseAbstract
     public function testMapWhenArrayTypedPropertyGivenWithoutDocBlock_shouldNotChangeStructure()
     {
         $mapper = $this->getMapper();
-
-        $this->expectTypeRetrievedFromDocBlock('', null);
-
-        $array = ['key1' => 'value1', 'key2' => 'value2'];
-        $input = [
+        $array  = ['key1' => 'value1', 'key2' => 'value2'];
+        $input  = [
             'array' => $array,
         ];
 
@@ -81,11 +69,8 @@ class MapperTest extends TestCaseAbstract
     public function testMapWhenArrayTypedPropertyGivenWithArrayDockBlockType_shouldNotChangeStructure()
     {
         $mapper = $this->getMapper();
-
-        $this->expectTypeRetrievedFromDocBlock('/** @var array */', new DocBlockType('array', false, true, false));
-
-        $array = ['key1' => 'value1', 'key2' => 'value2'];
-        $input = [
+        $array  = ['key1' => 'value1', 'key2' => 'value2'];
+        $input  = [
             'array' => $array,
         ];
 
@@ -98,10 +83,7 @@ class MapperTest extends TestCaseAbstract
     public function testMapWhenArrayTypedPropertyGivenWithBuiltInDockBlockType_shouldCastElements()
     {
         $mapper = $this->getMapper();
-
-        $this->expectTypeRetrievedFromDocBlock('/** @var int[] */', new DocBlockType('int', false, true, false));
-
-        $input = [
+        $input  = [
             'scalarTypedArray' => ['1', '2'],
         ];
 
@@ -111,17 +93,23 @@ class MapperTest extends TestCaseAbstract
         $this->assertSame([1, 2], $result->getScalarTypedArray());
     }
 
+    public function testMapWhenArrayIsNull_shouldMapProperly()
+    {
+        $mapper = $this->getMapper();
+        $input  = [
+            'scalarTypedArray' => null,
+        ];
+
+        /** @var ScalarDocBlockTypedArrayStub $result */
+        $result = $mapper->map($input, ScalarDocBlockTypedArrayStub::class);
+
+        $this->assertSame(null, $result->getScalarTypedArray());
+    }
+
     public function testMapWhenArrayTypedPropertyGivenWithCustomDockBlockType_shouldMapElementsToCustomType()
     {
         $mapper = $this->getMapper();
-
-        $this->expectTypeRetrievedFromDocBlock('', null);
-        $this->expectTypeRetrievedFromDocBlock(
-            '/** @var \Emul\ArrayToClassMapper\Test\Unit\Stub\ScalarTypedStub[] */',
-            new DocBlockType('\Emul\ArrayToClassMapper\Test\Unit\Stub\ScalarTypedStub', false, false, false)
-        );
-
-        $input = [
+        $input  = [
             'objectArray' => [
                 ['int' => 1],
                 ['int' => 2],
@@ -140,13 +128,7 @@ class MapperTest extends TestCaseAbstract
     public function testMapWhenArrayTypedPropertyGivenWithCustomDockBlockTypeWithNullValue_shouldSetToEmptyArray()
     {
         $mapper = $this->getMapper();
-
-        $this->expectTypeRetrievedFromDocBlock(
-            '/** @var \Emul\ArrayToClassMapper\Test\Unit\Stub\ScalarTypedStub[] */',
-            new DocBlockType('\Emul\ArrayToClassMapper\Test\Unit\Stub\ScalarTypedStub', false, false, false)
-        );
-
-        $input = [];
+        $input  = [];
 
         /** @var ClassDocBlockTypedArrayStub $result */
         $result = $mapper->map($input, ClassDocBlockTypedArrayStub::class);
@@ -157,10 +139,7 @@ class MapperTest extends TestCaseAbstract
     public function testMapWhenClassTypedPropertyGivenWithNullValue_shouldSetToNull()
     {
         $mapper = $this->getMapper();
-
-        $this->expectTypeRetrievedFromDocBlock('', null);
-
-        $input = ['object' => null];
+        $input  = ['object' => null];
 
         /** @var ClassTypedStub $result */
         $result = $mapper->map($input, ClassTypedStub::class);
@@ -171,10 +150,7 @@ class MapperTest extends TestCaseAbstract
     public function testMapWhenClassDocBlockTypedPropertyGivenWithNullValue_shouldSetToNull()
     {
         $mapper = $this->getMapper();
-
-        $this->expectTypeRetrievedFromDocBlock('/** @var ScalarTypedStub|null */', new DocBlockType('ScalarTypedStub', true, false, true));
-
-        $input = ['object' => null];
+        $input  = ['object' => null];
 
         /** @var ClassDocBlockTypedStub $result */
         $result = $mapper->map($input, ClassDocBlockTypedStub::class);
@@ -185,10 +161,7 @@ class MapperTest extends TestCaseAbstract
     public function testMapWhenClassTypedPropertyGiven_shouldMap()
     {
         $mapper = $this->getMapper();
-
-        $this->expectTypeRetrievedFromDocBlock('', null);
-
-        $input = ['object' => ['int' => 1]];
+        $input  = ['object' => ['int' => 1]];
 
         /** @var ClassTypedStub $result */
         $result = $mapper->map($input, ClassTypedStub::class);
@@ -198,10 +171,7 @@ class MapperTest extends TestCaseAbstract
 
     public function testMapWhenArrayTypedPropertyGivenWithCustomDockBlockTypeAndCustomMapperProvided_shouldMapElementsWithGivenMapper()
     {
-        $currentTime = '2020-01-01 01:01:01';
-
-        $this->expectTypeRetrievedFromDocBlock('', null);
-
+        $currentTime  = '2020-01-01 01:01:01';
         $input        = ['currentTime' => $currentTime];
         $customMapper = \Closure::fromCallable(function (string $timeString) {
             return Carbon::createFromFormat('Y-m-d H:i:s', $timeString);
@@ -219,10 +189,7 @@ class MapperTest extends TestCaseAbstract
     public function testMapWhenTypelessPropertyGiven_shouldJustStore()
     {
         $mapper = $this->getMapper();
-
-        $this->expectTypeRetrievedFromDocBlock('', null);
-
-        $input = ['property' => 'value'];
+        $input  = ['property' => 'value'];
 
         /** @var TypelessStub $result */
         $result = $mapper->map($input, TypelessStub::class);
@@ -233,10 +200,7 @@ class MapperTest extends TestCaseAbstract
     public function testMapWhenScalarDocBlockTypePropertyGiven_shouldCastToDocumentedType()
     {
         $mapper = $this->getMapper();
-
-        $this->expectTypeRetrievedFromDocBlock('/** @var int|null */', new DocBlockType('int', true, true, true));
-
-        $input = ['int' => '1'];
+        $input  = ['int' => '1'];
 
         /** @var ScalarDocBlockTypedStub $result */
         $result = $mapper->map($input, ScalarDocBlockTypedStub::class);
@@ -246,10 +210,7 @@ class MapperTest extends TestCaseAbstract
 
     public function testMapWhenCustomDocBlockTypedPropertyGiven_shouldMapWithGivenMapper()
     {
-        $currentTime = '2020-01-01 01:01:01';
-
-        $this->expectTypeRetrievedFromDocBlock('/** @var \Carbon\Carbon */', new DocBlockType('\Carbon\Carbon', true, false, false));
-
+        $currentTime  = '2020-01-01 01:01:01';
         $input        = ['currentTime' => $currentTime];
         $customMapper = \Closure::fromCallable(function (string $timeString) {
             return Carbon::createFromFormat('Y-m-d H:i:s', $timeString);
@@ -266,12 +227,6 @@ class MapperTest extends TestCaseAbstract
 
     public function testMapWhenCustomDocBlockTypedArrayPropertyGiven_shouldMapWithGivenMapper()
     {
-        $this->expectTypeRetrievedFromDocBlock(
-            '/** @var \Emul\ArrayToClassMapper\Test\Unit\Stub\CustomStub[] */',
-            new DocBlockType('\Emul\ArrayToClassMapper\Test\Unit\Stub\CustomStub', false, false, false)
-        );
-        $this->expectTypeRetrievedFromDocBlock('', null);
-
         $input        = [
             'objectArray' => [
                 ['key' => 'first', 'value' => '1'],
@@ -297,13 +252,8 @@ class MapperTest extends TestCaseAbstract
         $this->assertSame('prefix_2', $result->getObjectArray()[1]->getValue());
     }
 
-    private function expectTypeRetrievedFromDocBlock(string $docBlock, ?DocBlockType $expectedResult)
-    {
-        $this->docBlockParser->shouldReceive('getType')->with($docBlock)->andReturn($expectedResult);
-    }
-
     private function getMapper(): Mapper
     {
-        return new Mapper($this->docBlockParser);
+        return new Mapper(new DocBlockParser());
     }
 }
