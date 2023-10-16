@@ -5,10 +5,10 @@ namespace Emul\ArrayToClassMapper\Test\Unit\Stub;
 
 class ScalarDocBlockTypedArrayStub
 {
-    /** @var int[] */
-    private array $scalarTypedArray;
+    /** @var int[]|null */
+    private ?array $scalarTypedArray;
 
-    public function getScalarTypedArray(): array
+    public function getScalarTypedArray(): ?array
     {
         return $this->scalarTypedArray;
     }
