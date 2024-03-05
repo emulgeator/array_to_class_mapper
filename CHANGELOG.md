@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [0.2.0] - 2024-03-05
+
+### Added
+- When a key in the input array has a special character, the library will try to find the property by removing the special characters
+
 ## [0.1.4] - 2023-11-16
 
 ### Fixed
