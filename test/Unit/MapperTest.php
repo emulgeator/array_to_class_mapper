@@ -41,6 +41,17 @@ class MapperTest extends TestCaseAbstract
         $this->assertNull($result->getInt());
     }
 
+    public function testMapWhenKeyContainsSpecialCharacter_shouldSetByRemovingSpecialChars()
+    {
+        $mapper = $this->getMapper();
+        $input  = ['@int' => 12];
+
+        /** @var ScalarTypedStub $result */
+        $result = $mapper->map($input, ScalarTypedStub::class);
+
+        $this->assertSame(12, $result->getInt());
+    }
+
     public function testMapWhenBuiltInTypedPropertyGiven_shouldCast()
     {
         $mapper = $this->getMapper();

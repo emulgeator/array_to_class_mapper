@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Emul\ArrayToClassMapper;
@@ -27,6 +28,11 @@ class Mapper
         $this->customMappers[$type] = $mapper;
     }
 
+    public function removeSpecialCharacters(string $key): string
+    {
+        return preg_replace('#[^A-Za-z0-9_]#', '', $key);
+    }
+
     public function getCustomMapper(string $type): ?Closure
     {
         $type = $this->formatCustomTypeName($type);
@@ -40,10 +46,11 @@ class Mapper
     {
         $object          = (new ReflectionClass($className))->newInstanceWithoutConstructor();
         $reflectionClass = (new ReflectionClass($object));
-
         $classProperties = $reflectionClass->getProperties();
 
         foreach ($input as $key => $value) {
+            $key = $this->removeSpecialCharacters($key);
+
             foreach ($classProperties as $property) {
                 if ($key !== $property->getName()) {
                     continue;
@@ -55,37 +62,9 @@ class Mapper
                 $type         = $property->getType();
 
                 if (!empty($type)) {
-                    if ($type->isBuiltin()) {
-                        if ($type->getName() === 'array') {
-                            if (empty($docBlockType)) {
-                                $property->setValue($object, $value);
-                            } else {
-                                $valueCasted = is_null($value) ? null : $this->castArray($value, $docBlockType);
-                                $property->setValue($object, $valueCasted);
-                            }
-                        } else {
-                            $property->setValue($object, $value);
-                        }
-                    } else {
-                        $this->setCustomValue($object, $property, $type->getName(), $value);
-                    }
+                    $this->setValueByPhpType($type, $docBlockType, $property, $object, $value);
                 } else {
-                    if (empty($docBlockType)) {
-                        $property->setValue($object, $value);
-                    } else {
-                        if ($docBlockType->isBuiltIn()) {
-                            if ($docBlockType->getName() === 'array') {
-                                $property->setValue($object, $this->castArray($value, $docBlockType));
-                            } else {
-                                settype($value, $docBlockType->getName());
-                                $property->setValue($object, $value);
-                            }
-                        } elseif (!$docBlockType->isSingle()) {
-                            $property->setValue($object, $this->castArray($value, $docBlockType));
-                        } else {
-                            $this->setCustomValue($object, $property, $docBlockType->getName(), $value);
-                        }
-                    }
+                    $this->setValueByDocBlock($docBlockType, $property, $object, $value);
                 }
             }
         }
@@ -100,8 +79,7 @@ class Mapper
             && empty($this->getCustomMapper($typeName))
         ) {
             $property->setValue($object, null);
-        }
-        else {
+        } else {
             $property->setValue($object, $this->castCustom($value, $typeName));
         }
     }
@@ -145,5 +123,43 @@ class Mapper
     private function formatCustomTypeName(string $type): string
     {
         return ltrim($type, '\\');
+    }
+
+    private function setValueByPhpType(\ReflectionNamedType $type, ?DocBlockType $docBlockType, \ReflectionProperty $property, $object, $value): void
+    {
+        if ($type->isBuiltin()) {
+            if ($type->getName() === 'array') {
+                if (empty($docBlockType)) {
+                    $property->setValue($object, $value);
+                } else {
+                    $valueCasted = is_null($value) ? null : $this->castArray($value, $docBlockType);
+                    $property->setValue($object, $valueCasted);
+                }
+            } else {
+                $property->setValue($object, $value);
+            }
+        } else {
+            $this->setCustomValue($object, $property, $type->getName(), $value);
+        }
+    }
+
+    private function setValueByDocBlock(?DocBlockType $docBlockType, \ReflectionProperty $property, $object, $value): void
+    {
+        if (empty($docBlockType)) {
+            $property->setValue($object, $value);
+        } else {
+            if ($docBlockType->isBuiltIn()) {
+                if ($docBlockType->getName() === 'array') {
+                    $property->setValue($object, $this->castArray($value, $docBlockType));
+                } else {
+                    settype($value, $docBlockType->getName());
+                    $property->setValue($object, $value);
+                }
+            } elseif (!$docBlockType->isSingle()) {
+                $property->setValue($object, $this->castArray($value, $docBlockType));
+            } else {
+                $this->setCustomValue($object, $property, $docBlockType->getName(), $value);
+            }
+        }
     }
 }
