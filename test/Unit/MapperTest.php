@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Emul\ArrayToClassMapper\DocBlock\DocBlockParser;
 use Emul\ArrayToClassMapper\Mapper;
 use Emul\ArrayToClassMapper\Test\Unit\Stub\ArrayDocBlockTypedArrayStub;
+use Emul\ArrayToClassMapper\Test\Unit\Stub\BoolTypedStub;
 use Emul\ArrayToClassMapper\Test\Unit\Stub\ClassDocBlockTypedArrayStub;
 use Emul\ArrayToClassMapper\Test\Unit\Stub\ClassDocBlockTypedStub;
 use Emul\ArrayToClassMapper\Test\Unit\Stub\ClassTypedStub;
@@ -23,13 +24,6 @@ use Emul\ArrayToClassMapper\Test\Unit\Stub\TypelessStub;
 
 class MapperTest extends TestCaseAbstract
 {
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->docBlockParser = \Mockery::mock(DocBlockParser::class);
-    }
-
     public function testMapWhenNullGiven_shouldSet()
     {
         $mapper = $this->getMapper();
@@ -61,6 +55,18 @@ class MapperTest extends TestCaseAbstract
         $result = $mapper->map($input, ScalarTypedStub::class);
 
         $this->assertSame(1, $result->getInt());
+    }
+
+    public function testMapWithBoolean_shouldCastProperly()
+    {
+        $mapper = $this->getMapper();
+        $input  = ['bool' => 'false', 'boolDoc' => 'on'];
+
+        /** @var BoolTypedStub $result */
+        $result = $mapper->map($input, BoolTypedStub::class);
+
+        $this->assertFalse($result->getBool());
+        $this->assertTrue($result->getBoolDoc());
     }
 
     public function testMapWhenArrayTypedPropertyGivenWithoutDocBlock_shouldNotChangeStructure()
