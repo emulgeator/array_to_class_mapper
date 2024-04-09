@@ -35,6 +35,28 @@ class MapperTest extends TestCaseAbstract
         $this->assertNull($result->getInt());
     }
 
+    public function testMapWhenEmptyStringGivenForNullableInt_shouldSetToNull()
+    {
+        $mapper = $this->getMapper();
+        $input  = ['int' => ''];
+
+        /** @var ScalarTypedStub $result */
+        $result = $mapper->map($input, ScalarTypedStub::class);
+
+        $this->assertNull($result->getInt());
+    }
+
+    public function testMapWhenEmptyStringGivenForNullableFloat_shouldSetToNull()
+    {
+        $mapper = $this->getMapper();
+        $input  = ['float' => ''];
+
+        /** @var ScalarTypedStub $result */
+        $result = $mapper->map($input, ScalarTypedStub::class);
+
+        $this->assertNull($result->getFloat());
+    }
+
     public function testMapWhenKeyContainsSpecialCharacter_shouldSetByRemovingSpecialChars()
     {
         $mapper = $this->getMapper();

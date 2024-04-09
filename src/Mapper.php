@@ -136,8 +136,18 @@ class Mapper
                     $property->setValue($object, $valueCasted);
                 }
             } else {
-                if ($type->getName() === 'bool') {
-                    $value = Caster::castToBool($value);
+                switch ($type->getName()) {
+                    case 'bool':
+                        $value = Caster::castToBool($value);
+                        break;
+
+                    case 'int':
+                        $value = Caster::castToInt($value);
+                        break;
+
+                    case 'float':
+                        $value = Caster::castToInt($value);
+                        break;
                 }
                 $property->setValue($object, $value);
             }
