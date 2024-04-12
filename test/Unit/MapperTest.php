@@ -71,12 +71,16 @@ class MapperTest extends TestCaseAbstract
     public function testMapWhenBuiltInTypedPropertyGiven_shouldCast()
     {
         $mapper = $this->getMapper();
-        $input  = ['int' => '1'];
+        $input  = [
+            'int'   => '1',
+            'float' => '1.23',
+        ];
 
         /** @var ScalarTypedStub $result */
         $result = $mapper->map($input, ScalarTypedStub::class);
 
         $this->assertSame(1, $result->getInt());
+        $this->assertSame(1.23, $result->getFloat());
     }
 
     public function testMapWithBoolean_shouldCastProperly()

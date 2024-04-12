@@ -146,7 +146,7 @@ class Mapper
                         break;
 
                     case 'float':
-                        $value = Caster::castToInt($value);
+                        $value = Caster::castToFloat($value);
                         break;
                 }
                 $property->setValue($object, $value);
